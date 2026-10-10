@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>htmx Calendar from a Server-Rendered Table | Lattice Grid</title>
+<meta name="description" content="An htmx calendar built from a server-rendered table: bind it to a table grid or build it from a plain table, post each dragged event with hx-post, move one event out of band, swap teams, and keep the view on Back.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.97.0/lattice-grid.min.css">
+<link rel="stylesheet" href="styles.css">
+<!-- The grid comes from the published package. To use a newer release, change the version in these lines. -->
+<script type="importmap">
+{ "imports": {
+  "@toclocoinc/lattice-grid/modules/htmx": "https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.97.0/modules/htmx.esm.min.js" } }
+</script>
+</head>
+<body>
+<header>
+  <h1>htmx calendar from a server-rendered table</h1>
+  <p class="lede">The server renders a bookings table and an on-call rota as plain tables. Lattice turns the first into a calendar bound to its grid and the second into a calendar of its own, with no mount code, and htmx handles the swaps, the
+  out-of-band update and the save. A stand-in server answers htmx's requests in your browser, so nothing leaves the page.</p>
+  <p class="links"><a href="https://github.com/toclocoinc/lattice-grid-demo-htmx-calendar">Code on GitHub</a>
+  <a href="https://www.latticegrid.dev/htmx/">Lattice Grid with htmx</a></p>
+</header>
+<main class="showcase">
+  <div class="demo">
+    <div id="htmx-history" hx-history-elt>
+      <div id="calendar-view"><div class="view"><div class="filters"><button hx-get="/htmx-demo/calendar/bookings?team=&amp;view=month" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=&amp;view=month" aria-pressed="true">All teams</button>
+  <button hx-get="/htmx-demo/calendar/bookings?team=Platform&amp;view=month" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=Platform&amp;view=month" aria-pressed="false">Platform</button>
+  <button hx-get="/htmx-demo/calendar/bookings?team=Design&amp;view=month" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=Design&amp;view=month" aria-pressed="false">Design</button>
+  <button hx-get="/htmx-demo/calendar/bookings?team=Support&amp;view=month" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=Support&amp;view=month" aria-pressed="false">Support</button>
+  <button hx-get="/htmx-demo/calendar/bookings?team=&amp;view=month" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=&amp;view=month" aria-pressed="true">Month view</button>
+  <button hx-get="/htmx-demo/calendar/bookings?team=&amp;view=week" hx-target="#calendar-view"
+      hx-push-url="/lattice-grid-demo-htmx-calendar/?team=&amp;view=week" aria-pressed="false">Week view</button></div>
+<div class="panes">
+<section class="pane">
+<h3>Bookings: a calendar bound to a grid <button class="action" hx-post="/htmx-demo/calendar/shift" hx-vals='{"kind": "booking", "team": ""}' hx-swap="none">Server moves one booking</button></h3>
+<div data-lattice-calendar data-lattice-bind="bookings" hx-post="/htmx-demo/calendar/save" hx-trigger="lattice:calendar-change"
+  hx-vals='js:{id: event.detail.id, start: event.detail.start, end: event.detail.end}'
+  hx-target="#save-log" hx-swap="afterbegin" class="bookings-calendar is-month"><i id="booking-B1" data-lattice-row="B1"></i><i id="booking-B2" data-lattice-row="B2"></i><i id="booking-B3" data-lattice-row="B3"></i><i id="booking-B4" data-lattice-row="B4"></i><i id="booking-B5" data-lattice-row="B5"></i><i id="booking-B6" data-lattice-row="B6"></i><i id="booking-B7" data-lattice-row="B7"></i><i id="booking-B8" data-lattice-row="B8"></i><i id="booking-B9" data-lattice-row="B9"></i><i id="booking-B10" data-lattice-row="B10"></i><i id="booking-B11" data-lattice-row="B11"></i><i id="booking-B12" data-lattice-row="B12"></i><i id="booking-B13" data-lattice-row="B13"></i><i id="booking-B14" data-lattice-row="B14"></i><i id="booking-B15" data-lattice-row="B15"></i><i id="booking-B16" data-lattice-row="B16"></i><i id="booking-B17" data-lattice-row="B17"></i><i id="booking-B18" data-lattice-row="B18"></i><i id="booking-B19" data-lattice-row="B19"></i><i id="booking-B20" data-lattice-row="B20"></i><i id="booking-B21" data-lattice-row="B21"></i><i id="booking-B22" data-lattice-row="B22"></i><i id="booking-B23" data-lattice-row="B23"></i><i id="booking-B24" data-lattice-row="B24"></i><i id="booking-B25" data-lattice-row="B25"></i><i id="booking-B26" data-lattice-row="B26"></i><i id="booking-B27" data-lattice-row="B27"></i><i id="booking-B28" data-lattice-row="B28"></i><i id="booking-B29" data-lattice-row="B29"></i><i id="booking-B30" data-lattice-row="B30"></i><i id="booking-B31" data-lattice-row="B31"></i><i id="booking-B32" data-lattice-row="B32"></i><i id="booking-B33" data-lattice-row="B33"></i><i id="booking-B34" data-lattice-row="B34"></i><i id="booking-B35" data-lattice-row="B35"></i><i id="booking-B36" data-lattice-row="B36"></i><i id="booking-B37" data-lattice-row="B37"></i><i id="booking-B38" data-lattice-row="B38"></i></div>
+<script type="application/json" data-lattice-config>{"view":"month","date":"2026-10-12","firstDay":1,"timeZone":"UTC","startProperty":"start","endProperty":"end","card":{"title":"title"}}</script>
+</section>
+<section class="pane">
+<table id="bookings" data-lattice-grid>
+  <thead><tr><th data-field="title">Booking</th><th data-field="team">Team</th>
+    <th data-field="start" data-type="date" data-edit>Start</th><th data-field="end" data-type="date" data-edit>End</th></tr></thead>
+  <tbody>
+  <tr data-lattice-row="B1" ><td>Icon audit</td><td>Design</td><td>2026-10-01</td><td>2026-10-02</td></tr>
+  <tr data-lattice-row="B2" ><td>Capacity review</td><td>Platform</td><td>2026-10-02</td><td>2026-10-02</td></tr>
+  <tr data-lattice-row="B3" ><td>Release freeze</td><td>Platform</td><td>2026-10-05</td><td>2026-10-07</td></tr>
+  <tr data-lattice-row="B4" ><td>Design review</td><td>Design</td><td>2026-10-06</td><td>2026-10-06</td></tr>
+  <tr data-lattice-row="B5" ><td>Ticket triage clinic</td><td>Support</td><td>2026-10-06</td><td>2026-10-07</td></tr>
+  <tr data-lattice-row="B6" ><td>On-call handover</td><td>Support</td><td>2026-10-08</td><td>2026-10-08</td></tr>
+  <tr data-lattice-row="B7" ><td>Accessibility review</td><td>Design</td><td>2026-10-08</td><td>2026-10-09</td></tr>
+  <tr data-lattice-row="B8" ><td>Security patch window</td><td>Platform</td><td>2026-10-09</td><td>2026-10-09</td></tr>
+  <tr data-lattice-row="B9" ><td>Load test window</td><td>Platform</td><td>2026-10-12</td><td>2026-10-14</td></tr>
+  <tr data-lattice-row="B10" ><td>Brand workshop</td><td>Design</td><td>2026-10-13</td><td>2026-10-13</td></tr>
+  <tr data-lattice-row="B11" ><td>Knowledge base sprint</td><td>Support</td><td>2026-10-12</td><td>2026-10-14</td></tr>
+  <tr data-lattice-row="B12" ><td>Support rota change</td><td>Support</td><td>2026-10-15</td><td>2026-10-16</td></tr>
+  <tr data-lattice-row="B13" ><td>Design office hours</td><td>Design</td><td>2026-10-14</td><td>2026-10-14</td></tr>
+  <tr data-lattice-row="B14" ><td>API deprecation notice</td><td>Platform</td><td>2026-10-15</td><td>2026-10-15</td></tr>
+  <tr data-lattice-row="B15" ><td>Prototype testing</td><td>Design</td><td>2026-10-16</td><td>2026-10-16</td></tr>
+  <tr data-lattice-row="B16" ><td>Chaos day</td><td>Platform</td><td>2026-10-16</td><td>2026-10-16</td></tr>
+  <tr data-lattice-row="B17" ><td>Database migration</td><td>Platform</td><td>2026-10-19</td><td>2026-10-20</td></tr>
+  <tr data-lattice-row="B18" ><td>Usability sessions</td><td>Design</td><td>2026-10-20</td><td>2026-10-22</td></tr>
+  <tr data-lattice-row="B19" ><td>Incident review</td><td>Support</td><td>2026-10-21</td><td>2026-10-21</td></tr>
+  <tr data-lattice-row="B20" ><td>Cache rollout</td><td>Platform</td><td>2026-10-21</td><td>2026-10-22</td></tr>
+  <tr data-lattice-row="B21" ><td>Macro clean-up</td><td>Support</td><td>2026-10-19</td><td>2026-10-19</td></tr>
+  <tr data-lattice-row="B22" ><td>Customer advisory call</td><td>Support</td><td>2026-10-22</td><td>2026-10-22</td></tr>
+  <tr data-lattice-row="B23" ><td>Dark mode palette</td><td>Design</td><td>2026-10-23</td><td>2026-10-23</td></tr>
+  <tr data-lattice-row="B24" ><td>Observability training</td><td>Platform</td><td>2026-10-23</td><td>2026-10-23</td></tr>
+  <tr data-lattice-row="B25" ><td>Quarterly planning</td><td>Platform</td><td>2026-10-26</td><td>2026-10-27</td></tr>
+  <tr data-lattice-row="B26" ><td>Escalation drill</td><td>Support</td><td>2026-10-27</td><td>2026-10-27</td></tr>
+  <tr data-lattice-row="B27" ><td>Style guide handoff</td><td>Design</td><td>2026-10-28</td><td>2026-10-28</td></tr>
+  <tr data-lattice-row="B28" ><td>Illustration review</td><td>Design</td><td>2026-10-26</td><td>2026-10-26</td></tr>
+  <tr data-lattice-row="B29" ><td>Customer webinar</td><td>Support</td><td>2026-10-29</td><td>2026-10-29</td></tr>
+  <tr data-lattice-row="B30" ><td>Dependency upgrades</td><td>Platform</td><td>2026-10-28</td><td>2026-10-30</td></tr>
+  <tr data-lattice-row="B31" ><td>Month-end report</td><td>Support</td><td>2026-10-30</td><td>2026-10-30</td></tr>
+  <tr data-lattice-row="B32" ><td>Retrospective</td><td>Platform</td><td>2026-10-30</td><td>2026-10-30</td></tr>
+  <tr data-lattice-row="B33" ><td>Release planning</td><td>Platform</td><td>2026-09-28</td><td>2026-09-30</td></tr>
+  <tr data-lattice-row="B34" ><td>Research readout</td><td>Design</td><td>2026-09-30</td><td>2026-09-30</td></tr>
+  <tr data-lattice-row="B35" ><td>Holiday cover plan</td><td>Support</td><td>2026-09-29</td><td>2026-09-30</td></tr>
+  <tr data-lattice-row="B36" ><td>Pricing page launch</td><td>Design</td><td>2026-11-02</td><td>2026-11-03</td></tr>
+  <tr data-lattice-row="B37" ><td>Failover rehearsal</td><td>Platform</td><td>2026-11-03</td><td>2026-11-04</td></tr>
+  <tr data-lattice-row="B38" ><td>New starter onboarding</td><td>Support</td><td>2026-11-02</td><td>2026-11-04</td></tr>
+  </tbody>
+</table>
+<h3>On-call rota: a calendar built from a table <button class="action" hx-post="/htmx-demo/calendar/shift" hx-vals='{"kind": "shift", "team": ""}' hx-swap="none">Server moves one shift</button></h3>
+<div data-lattice-calendar hx-post="/htmx-demo/calendar/save" hx-trigger="lattice:calendar-change"
+  hx-vals='js:{id: event.detail.id, start: event.detail.start, end: event.detail.end}'
+  hx-target="#save-log" hx-swap="afterbegin" class="rota-calendar">
+  <table>
+    <thead><tr><th data-field="person">On call</th><th data-field="start" data-type="date">From</th><th data-field="end" data-type="date">To</th></tr></thead>
+    <tbody>
+  <tr data-lattice-row="R1" ><td>Ana Lopez</td><td>2026-09-28</td><td>2026-10-01</td></tr>
+  <tr data-lattice-row="R2" ><td>Ben Okafor</td><td>2026-10-02</td><td>2026-10-05</td></tr>
+  <tr data-lattice-row="R3" ><td>Ana Lopez</td><td>2026-10-06</td><td>2026-10-09</td></tr>
+  <tr data-lattice-row="R4" ><td>Ben Okafor</td><td>2026-10-10</td><td>2026-10-11</td></tr>
+  <tr data-lattice-row="R5" ><td>Priya Raman</td><td>2026-10-12</td><td>2026-10-14</td></tr>
+  <tr data-lattice-row="R6" ><td>Ben Okafor</td><td>2026-10-15</td><td>2026-10-18</td></tr>
+  <tr data-lattice-row="R7" ><td>Ana Lopez</td><td>2026-10-19</td><td>2026-10-22</td></tr>
+  <tr data-lattice-row="R8" ><td>Priya Raman</td><td>2026-10-23</td><td>2026-10-26</td></tr>
+  <tr data-lattice-row="R9" ><td>Ben Okafor</td><td>2026-10-27</td><td>2026-10-30</td></tr>
+  <tr data-lattice-row="R10" ><td>Chloe Marsh</td><td>2026-09-28</td><td>2026-10-02</td></tr>
+  <tr data-lattice-row="R11" ><td>Dev Patel</td><td>2026-10-03</td><td>2026-10-06</td></tr>
+  <tr data-lattice-row="R12" ><td>Hana Kimura</td><td>2026-10-07</td><td>2026-10-11</td></tr>
+  <tr data-lattice-row="R13" ><td>Chloe Marsh</td><td>2026-10-12</td><td>2026-10-13</td></tr>
+  <tr data-lattice-row="R14" ><td>Dev Patel</td><td>2026-10-14</td><td>2026-10-18</td></tr>
+  <tr data-lattice-row="R15" ><td>Hana Kimura</td><td>2026-10-19</td><td>2026-10-23</td></tr>
+  <tr data-lattice-row="R16" ><td>Chloe Marsh</td><td>2026-10-24</td><td>2026-10-28</td></tr>
+  <tr data-lattice-row="R17" ><td>Dev Patel</td><td>2026-10-29</td><td>2026-11-02</td></tr>
+  <tr data-lattice-row="R18" ><td>Eva Lindqvist</td><td>2026-09-28</td><td>2026-10-01</td></tr>
+  <tr data-lattice-row="R19" ><td>Femi Adeyemi</td><td>2026-10-02</td><td>2026-10-04</td></tr>
+  <tr data-lattice-row="R20" ><td>Gus Moreno</td><td>2026-10-05</td><td>2026-10-11</td></tr>
+  <tr data-lattice-row="R21" ><td>Eva Lindqvist</td><td>2026-10-12</td><td>2026-10-15</td></tr>
+  <tr data-lattice-row="R22" ><td>Femi Adeyemi</td><td>2026-10-16</td><td>2026-10-18</td></tr>
+  <tr data-lattice-row="R23" ><td>Gus Moreno</td><td>2026-10-19</td><td>2026-10-25</td></tr>
+  <tr data-lattice-row="R24" ><td>Eva Lindqvist</td><td>2026-10-26</td><td>2026-10-29</td></tr>
+  <tr data-lattice-row="R25" ><td>Femi Adeyemi</td><td>2026-10-30</td><td>2026-11-01</td></tr>
+    </tbody>
+  </table>
+  <i id="shift-R1" data-lattice-row="R1"></i><i id="shift-R2" data-lattice-row="R2"></i><i id="shift-R3" data-lattice-row="R3"></i><i id="shift-R4" data-lattice-row="R4"></i><i id="shift-R5" data-lattice-row="R5"></i><i id="shift-R6" data-lattice-row="R6"></i><i id="shift-R7" data-lattice-row="R7"></i><i id="shift-R8" data-lattice-row="R8"></i><i id="shift-R9" data-lattice-row="R9"></i><i id="shift-R10" data-lattice-row="R10"></i><i id="shift-R11" data-lattice-row="R11"></i><i id="shift-R12" data-lattice-row="R12"></i><i id="shift-R13" data-lattice-row="R13"></i><i id="shift-R14" data-lattice-row="R14"></i><i id="shift-R15" data-lattice-row="R15"></i><i id="shift-R16" data-lattice-row="R16"></i><i id="shift-R17" data-lattice-row="R17"></i><i id="shift-R18" data-lattice-row="R18"></i><i id="shift-R19" data-lattice-row="R19"></i><i id="shift-R20" data-lattice-row="R20"></i><i id="shift-R21" data-lattice-row="R21"></i><i id="shift-R22" data-lattice-row="R22"></i><i id="shift-R23" data-lattice-row="R23"></i><i id="shift-R24" data-lattice-row="R24"></i><i id="shift-R25" data-lattice-row="R25"></i>
+</div>
+<script type="application/json" data-lattice-config>{"view":"week","date":"2026-10-12","firstDay":1,"timeZone":"UTC","startProperty":"start","endProperty":"end","card":{"title":"person"}}</script>
+</section>
+</div></div></div>
+      <h3 class="saved-head">Saved by the server</h3>
+      <ul id="save-log" class="saved" aria-live="polite"></ul>
+    </div>
+  </div>
+  <aside>
+    <h2>Try the five steps</h2>
+    <ol class="steps">
+      <li><strong>Built on load.</strong> The bookings were a server-rendered table grid and the first calendar is bound to it; the on-call rota was a plain table inside the second calendar, which replaced it on load.</li>
+      <li><strong>Move an event.</strong> Drag a booking in the first calendar, or a shift in the second. lattice:calendar-change is posted with hx-post and the server confirms below.</li>
+      <li><strong>Out of band.</strong> Press "Server moves one booking" or "Server moves one shift". One row comes back out of band and its card moves a day, in the grid and the calendar.</li>
+      <li><strong>Swap.</strong> Pick a team, or the Week view. hx-get replaces the whole view and both calendars are rebuilt from the new tables.</li>
+      <li><strong>Back.</strong> Change the team and the view, then press the browser Back button. The previous team and view return, with both calendars populated.</li>
+    </ol>
+    <h3>Requests the stand-in server answered</h3>
+    <ul id="request-log" class="log" aria-live="polite"><li>none yet</li></ul>
+  </aside>
+</main>
+<footer>Built with <a href="https://www.latticegrid.dev/htmx/">Lattice Grid</a>. No keys, no analytics.</footer>
+<script type="module" src="main.js"></script>
+</body>
+</html>
