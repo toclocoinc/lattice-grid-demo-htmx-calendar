@@ -2,8 +2,8 @@
 // module next so its listeners are registered, and htmx itself last. htmx then
 // processes the page and fires htmx:load for the server-rendered markup, which
 // is what builds both calendars. No mount call anywhere.
-import { installMockServer } from './src/mock-server.js?v=202610101506';
-import { routes } from './src/server.js?v=202610101506';
+import { installMockServer } from './src/mock-server.js?v=202610111200';
+import { routes, pageFragment } from './src/server.js?v=202610111200';
 
 const HTMX = 'https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js';
 const HTMX_SRI = 'sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+';
@@ -20,8 +20,15 @@ const loadScript = (src, attrs = {}) => new Promise((resolve, reject) => {
 });
 
 installMockServer(routes);
+// A real server returns the page for the address it was asked for. The stand-in does the same here,
+// before Lattice or htmx see the markup, so a pushed address (?team=Growth) opens on its own view
+// and is built once, not built as the default and swapped.
+if (location.search) document.getElementById('calendar-view').innerHTML = pageFragment(location.search);
 const lattice = await import('@toclocoinc/lattice-grid/modules/htmx');
 lattice.setLicence(LICENCE);
+// htmx 2.0.4 starts on DOMContentLoaded unless the document is already 'complete'. After the awaited
+// import above, DOMContentLoaded may have fired while the page is still loading, so wait for 'load'.
+if (document.readyState !== 'complete') await new Promise((r) => { addEventListener('load', r, { once: true }); });
 await loadScript(HTMX, { integrity: HTMX_SRI, crossorigin: 'anonymous' });
 
 // The request log: one line per request the stand-in server answered.

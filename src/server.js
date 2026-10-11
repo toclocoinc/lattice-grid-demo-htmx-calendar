@@ -136,10 +136,15 @@ export function calendarFragment(team = '', view = 'month', page = location.path
 </div></div>`;
 }
 
+// The team and view a request names; anything unknown falls back to All teams and the month view.
+const choice = (params) => [teams.includes(params.team) ? params.team : '', params.view === 'week' ? 'week' : 'month'];
+
+/** The page for an address, as a server renders it: the view that the query string (?team=&view=) asks for. */
+export const pageFragment = (search = location.search) => calendarFragment(...choice(Object.fromEntries(new URLSearchParams(search))));
+
 export const routes = {
   // hx-get: the whole view for one team; both calendars are rebuilt.
-  'GET /htmx-demo/calendar/bookings': ({ params }) =>
-    calendarFragment(teams.includes(params.team) ? params.team : '', params.view === 'week' ? 'week' : 'month'),
+  'GET /htmx-demo/calendar/bookings': ({ params }) => calendarFragment(...choice(params)),
 
   // hx-post from lattice:calendar-change: the new dates arrive as ISO strings in the calendar's timeZone.
   'POST /htmx-demo/calendar/save': ({ params }) => {

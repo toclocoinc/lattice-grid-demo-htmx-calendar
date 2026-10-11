@@ -99,6 +99,60 @@ try {
     check((await bookingCards(page)).includes('Release freeze') && (await rotaCards(page)).includes('Priya Raman'), 'back: both calendars are rebuilt');
     check((await page.evaluate(gridText)).includes('Release freeze'), 'back: the bound grid still has its rows');
     await page.screenshot({ path: `shots/back-${width}.png`, fullPage: true });
+
+    // The URL's own filter: a server renders the page for ?team=&view=, so open and reload show it, built once.
+    const built = (p) => p.waitForFunction(() => document.querySelectorAll('.bookings-calendar .lat-calendar__span').length > 0
+      && document.querySelectorAll('.rota-calendar .lat-calendar__span').length > 0 && document.querySelectorAll('#bookings [role=row]').length > 1, { timeout: 30000 });
+    const urlCases = [['', 'All teams,Month view', 'Release freeze'], ['?team=Design&view=month', 'Design,Month view', 'Brand workshop'],
+      ['?team=Support&view=week', 'Support,Week view', 'Knowledge base sprint'], ['?team=&view=week', 'All teams,Week view', ''], ['?team=Platform', 'Platform,Month view', 'Release freeze']];
+    const wrongTeam = { 'Design,Month view': 'Release freeze', 'Platform,Month view': 'Brand workshop' };
+    for (const [query, want, card] of urlCases) {
+      const q = await browser.newPage();
+      await q.setViewport({ width, height });
+      const qProblems = [];
+      q.on('console', (m) => { if (m.type() === 'error' || m.text().includes('[lattice]')) qProblems.push(m.text()); });
+      q.on('pageerror', (e) => qProblems.push(e.message));
+      await q.goto(url + query);
+      await built(q);
+      await sleep(500);
+      const what = `fresh open ${query || '(bare)'}`;
+      check(await pressed(q) === want, `${what}: pressed ${await pressed(q)}`);
+      if (card) check((await bookingCards(q)).includes(card), `${what}: shows ${card}`);
+      if (wrongTeam[want]) check(!(await bookingCards(q)).includes(wrongTeam[want]), `${what}: no other team's bookings`);
+      // Reload from cache repeatedly: each must show the same filter, built.
+      for (let i = 1; i <= 10; i += 1) {
+        await q.reload();
+        await built(q);
+        if (await pressed(q) !== want || (await bookingCards(q)).length === 0) check(false, `${what}: reload ${i} showed ${await pressed(q)}`);
+      }
+      check(await pressed(q) === want, `${what}: 10 cached reloads keep ${want}, built`);
+      check(qProblems.length === 0, `${what}: no console errors or [lattice] warnings ${qProblems.join(' / ')}`);
+      await q.close();
+    }
+    {
+      // Click a filter, then Refresh; then Back after Refresh.
+      const q = await browser.newPage();
+      await q.setViewport({ width, height });
+      const qProblems = [];
+      q.on('console', (m) => { if (m.type() === 'error' || m.text().includes('[lattice]')) qProblems.push(m.text()); });
+      q.on('pageerror', (e) => qProblems.push(e.message));
+      await q.goto(url);
+      await built(q);
+      await q.click('button[hx-get*="team=Support&amp;view=month"], button[hx-get*="team=Support&view=month"]');
+      await sleep(1500);
+      for (let i = 1; i <= 10; i += 1) {
+        await q.reload();
+        await built(q);
+        if (await pressed(q) !== 'Support,Month view') check(false, `click then refresh ${i}: showed ${await pressed(q)}`);
+      }
+      check(await pressed(q) === 'Support,Month view' && !(await bookingCards(q)).includes('Release freeze'), 'click a filter then Refresh x10: Support, built');
+      await q.goBack();
+      await built(q);
+      await sleep(1000);
+      check(await pressed(q) === 'All teams,Month view' && (await bookingCards(q)).includes('Release freeze'), `Back after Refresh: the previous view (${await pressed(q)})`);
+      check(qProblems.length === 0, `click/refresh/back: no console errors or [lattice] warnings ${qProblems.join(' / ')}`);
+      await q.close();
+    }
     check(problems.length === 0, `no console errors or [lattice] warnings ${problems.join(' / ')}`);
     await page.close();
   }
