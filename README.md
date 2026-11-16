@@ -24,7 +24,7 @@ npm run serve        # http://localhost:8000/
 npm run verify       # headless Chrome check of the steps (needs Chrome)
 ```
 
-The calendar and the grid load from the published `@toclocoinc/lattice-grid` package on jsDelivr; change the version in `index.html` and `package.json` to move to a newer release. On `localhost` no licence key is needed; the key in `main.js` is the public one for `toclocoinc.github.io`.
+The calendar and the grid load from the published `@toclocoinc/lattice-grid` package on jsDelivr; change the version in `index.html` (the stylesheet and the import map) and `package.json` to move to a newer release. On `localhost` no licence key is needed; the key in `main.js` is the public one for `toclocoinc.github.io`.
 
 ## Files
 
